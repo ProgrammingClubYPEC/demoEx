@@ -11,6 +11,7 @@
         <local:ListToStrMaterial x:Key="materialConverter"></local:ListToStrMaterial>
         <local:SummCostMaterialConverter x:Key="summConverter"></local:SummCostMaterialConverter>
         <local:TypeMaterialConverter x:Key="typeMaterialConverter"></local:TypeMaterialConverter>
+        
     </Window.Resources>
     <Grid>
         <ListBox x:Name="listBox" SelectionMode="Multiple" HorizontalAlignment="Left" Height="293" Margin="10,53,0,0" VerticalAlignment="Top" Width="774">
@@ -30,19 +31,22 @@
         </ListBox>
         <StackPanel x:Name="navigationStackPanel" Visibility="Hidden" Orientation="Horizontal" Margin="305,364,268.6,27">
             <Button x:Name="backBtn" Click="Btn_Back_Click">Назад</Button>
-            <WrapPanel x:Name="wrapPanel" Height="auto"></WrapPanel>
+            <StackPanel Orientation="Horizontal" Width="auto" x:Name="wrapPanel" ></StackPanel>
             <Button x:Name="nextBtn" Click="nextBtn_Click">Вперед</Button>
         </StackPanel>
-        <ComboBox Name="filterComboBox" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top" Width="120" DropDownClosed="filterComboBox_DropDownClosed">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"></CheckBox>
-                        <TextBlock Text="{Binding Title}"></TextBlock>
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <Grid Width="120" Height="22" Margin="10,26,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <ComboBox SelectionChanged="filterComboBox_SelectionChanged" Name="filterComboBox" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="120" DropDownClosed="filterComboBox_DropDownClosed" Grid.ColumnSpan="2">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Checked="CheckBox_Checked" IsChecked="{Binding Check, Mode=TwoWay}"></CheckBox>
+                            <TextBlock Text="{Binding Title}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Text="Фильтры" IsHitTestVisible="False" TextAlignment="Center"></TextBlock>
+        </Grid>
         <TextBox x:Name="searchTextBox"  HorizontalAlignment="Left" Height="23" Margin="145,25,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="240" TextChanged="TextBox_TextChanged"/>
         <ComboBox x:Name="sortComboBox" HorizontalAlignment="Left" Margin="405,26,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="sortComboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
@@ -51,5 +55,10 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="testBlock" Text="Нажми меня">
+            <TextBlock.InputBindings>
+                <MouseBinding Command="{Binding TextBlockClickCommand}" MouseAction="LeftClick"></MouseBinding>
+            </TextBlock.InputBindings>
+        </TextBlock>
     </Grid>
 </Window>
