@@ -5,19 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProductsIS"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" MinHeight="450" MinWidth="800">
     <Window.Resources>
         <local:ImageConvertet x:Key="imageConverter"></local:ImageConvertet>
         <local:ListToStrMaterial x:Key="materialConverter"></local:ListToStrMaterial>
         <local:SummCostMaterialConverter x:Key="summConverter"></local:SummCostMaterialConverter>
         <local:TypeMaterialConverter x:Key="typeMaterialConverter"></local:TypeMaterialConverter>
-        
+        <local:BoolToTextDecorConv x:Key="bttdConv"></local:BoolToTextDecorConv>
+        <Style x:Key="RadioButtonNavigationStyle" TargetType="{x:Type RadioButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <TextBlock Text="{TemplateBinding Content}" TextDecorations="{TemplateBinding IsChecked, Converter={StaticResource bttdConv}}"></TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="Cursor" Value="Hand"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ButtonNavigationStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <TextBlock Text="{TemplateBinding Content}"></TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
-        <ListBox x:Name="listBox" SelectionMode="Multiple" HorizontalAlignment="Left" Height="293" Margin="10,53,0,0" VerticalAlignment="Top" Width="774">
+        <ListBox x:Name="listBox" SelectionMode="Multiple" Margin="10,55">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Height="200">
                         <Image Margin="20" Source="{Binding Image, Converter={StaticResource imageConverter}}" Width="100"></Image>
                         <StackPanel Width="300" Orientation="Vertical">
                             <TextBlock FontSize="14" FontWeight="Bold" Margin="0,20,0,0"><Run Text="{Binding ProductType, Converter={StaticResource typeMaterialConverter}}"></Run> - <Run Text="{Binding Title}"></Run></TextBlock>
@@ -29,18 +58,28 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <StackPanel x:Name="navigationStackPanel" Visibility="Hidden" Orientation="Horizontal" Margin="305,364,268.6,27">
-            <Button x:Name="backBtn" Click="Btn_Back_Click">Назад</Button>
-            <StackPanel Orientation="Horizontal" Width="auto" x:Name="wrapPanel" ></StackPanel>
-            <Button x:Name="nextBtn" Click="nextBtn_Click">Вперед</Button>
+        <StackPanel x:Name="navigationStackPanel" Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="12,35">
+            <Button FontSize="15" Style="{StaticResource ButtonNavigationStyle}" x:Name="backBtn" Click="Btn_Back_Click">&lt;</Button>
+            <ItemsControl x:Name="numberNavigationPage">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"></StackPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <RadioButton  FontSize="15" GroupName="NavigationRadioButtonsGroup" IsChecked="{Binding Check}" Content="{Binding Title}" Style="{StaticResource RadioButtonNavigationStyle}" Checked="RadioButton_Checked"></RadioButton>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button  FontSize="15" x:Name="nextBtn" Style="{StaticResource ButtonNavigationStyle}" Click="nextBtn_Click">&gt;</Button>
         </StackPanel>
         <Grid Width="120" Height="22" Margin="10,26,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <ComboBox SelectionChanged="filterComboBox_SelectionChanged" Name="filterComboBox" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="120" DropDownClosed="filterComboBox_DropDownClosed" Grid.ColumnSpan="2">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Checked="CheckBox_Checked" IsChecked="{Binding Check, Mode=TwoWay}"></CheckBox>
-                            <TextBlock Text="{Binding Title}"></TextBlock>
+                            <CheckBox Checked="CheckBox_Checked" Content="{Binding Title}" IsChecked="{Binding Check, Mode=TwoWay}"></CheckBox>
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -55,10 +94,5 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="testBlock" Text="Нажми меня">
-            <TextBlock.InputBindings>
-                <MouseBinding Command="{Binding TextBlockClickCommand}" MouseAction="LeftClick"></MouseBinding>
-            </TextBlock.InputBindings>
-        </TextBlock>
     </Grid>
 </Window>

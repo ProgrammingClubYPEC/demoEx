@@ -20,29 +20,33 @@ namespace ProductsIS
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     /// 
-    class TextBlockClick : ICommand
-    {
-        public event EventHandler CanExecuteChanged;
-        public TextBlockClick()
-        {
+    
 
-        }
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            MessageBox.Show("Тест");
-        }
-    }
-    class Page
+    class Page : INotifyPropertyChanged
     {
-        ICommand command = new TextBlockClick();
-        public ICommand TextBlockClickCommand
+        public int NumberPage { get; set; }
+        private bool _isChecked;
+        public string Title
         {
-            get => command;
+            get
+            {
+                return NumberPage.ToString();
+            }
+        }
+        public List<Product> RangeProducts { get; set; }
+        public bool Check
+        {
+            get=> _isChecked;
+            set
+            {
+                _isChecked = value;
+                OpPropetyChange("Check");
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OpPropetyChange(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
     class FilterProductType : INotifyPropertyChanged
@@ -85,11 +89,12 @@ namespace ProductsIS
     }
     public partial class MainWindow : Window
     {
+
         int currentPage;
         int countPage;
         int countElements;
+        List<Page> pagesList = new List<Page>();
         public SortElement SortEl { get; set; }
-        ICollection<Product> products;
         FilterProductType productTypeAll;
         List<SortElement> sortElements;
         List<FilterProductType> filterProductType = new List<FilterProductType>();
@@ -104,7 +109,6 @@ namespace ProductsIS
                 new SortElement(){Id = 3, Name = "Минимальная стоимость"}
             };
             sortComboBox.ItemsSource = sortElements;
-            testBlock.DataContext = new Page();
             filterProductType.Add(productTypeAll);
             filterProductType.AddRange(ConnectDataBAse.GetContext().ProductType.Select(p=>new FilterProductType() { ProductType = p}));
             filterComboBox.ItemsSource = filterProductType;
@@ -112,8 +116,8 @@ namespace ProductsIS
         }
         public void UpdateList()
         {
-            wrapPanel.Children.Clear();
-            products = ConnectDataBAse.GetContext().Product.ToList();
+            pagesList.Clear();
+            ICollection<Product> products = ConnectDataBAse.GetContext().Product.ToList();
             if (!String.IsNullOrEmpty(searchTextBox.Text.Trim()))
                 products = products.Where(p => p.Title.Contains(searchTextBox.Text) || (String.IsNullOrEmpty(p.Description) && p.Description.Contains(searchTextBox.Text))).ToList();
             List<ProductType> filterList = filterProductType.GetRange(1,filterProductType.Count-1).Where(p => p.Check == true).Select(p => p.ProductType).ToList();
@@ -143,18 +147,22 @@ namespace ProductsIS
             countElements = products.Count;
             if (countElements > 20)
             {
+                numberNavigationPage.ItemsSource = null;
                 navigationStackPanel.Visibility = Visibility.Visible;
                 countPage = countElements / 20;
-                for (int i = 0; i < countPage; i++)
+                int i;
+                for (i = 0; i < countPage; i++)
+                    pagesList.Add(new Page() { NumberPage = i + 1, RangeProducts = products.ToList().GetRange(i * 20, 20) });
+                int remainsProduct = countElements % 20;
+                if(remainsProduct>0)
                 {
-                    Button btn = new Button();
-                    btn.Content = (i + 1).ToString();
-                    btn.Tag = i + 1;
-                    btn.Click += Btn_Click;
-                    wrapPanel.Children.Add(btn);
+                    pagesList.Add(new Page() { NumberPage = i + 1, RangeProducts = products.ToList().GetRange(i * 20, remainsProduct) });
+                    countPage++;
                 }
                 currentPage = 1;
-                UpdatePage();
+                numberNavigationPage.ItemsSource = pagesList;
+                pagesList[0].Check = true;
+                listBox.ItemsSource = pagesList[0].RangeProducts;
             }
             else
             {
@@ -163,29 +171,16 @@ namespace ProductsIS
             }
 
         }
-        public void UpdatePage()=>listBox.ItemsSource = products.ToList().GetRange((currentPage-1)*20,20);
-        private void Btn_Click(object sender, RoutedEventArgs e)
-        {
-            currentPage = (int)(sender as Button).Tag;
-            UpdatePage();
-        }
-
         private void Btn_Back_Click(object sender, RoutedEventArgs e)
         {
             if (currentPage != 1)
-            {
-                currentPage -= 1;
-                UpdatePage();
-            }
+                pagesList[currentPage - 2].Check = true;
         }
 
         private void nextBtn_Click(object sender, RoutedEventArgs e)
         {
             if (currentPage != countPage)
-            {
-                currentPage += 1;
-                UpdatePage();
-            }
+                pagesList[currentPage].Check = true;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -207,5 +202,11 @@ namespace ProductsIS
             sortWindow.Show();
         }
 
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            Page page = (sender as RadioButton).DataContext as Page;
+            currentPage = page.NumberPage;
+            listBox.ItemsSource = page.RangeProducts;
+        }
     }
 }

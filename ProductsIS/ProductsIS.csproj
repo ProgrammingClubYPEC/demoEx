@@ -73,6 +73,7 @@
     <Compile Include="AgentType.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="BoolToTextDecorConv.cs" />
     <Compile Include="ConnectDataBAse.cs" />
     <Compile Include="ImageConvertet.cs" />
     <Compile Include="ListToStrMaterial.cs" />
