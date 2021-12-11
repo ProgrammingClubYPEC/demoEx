@@ -12,13 +12,13 @@ namespace ProductsIS
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string str = "";
+            string str = null;
             ICollection<ProductMaterial> productMaterials = value as ICollection<ProductMaterial>;
             foreach(ProductMaterial productMaterial in productMaterials)
             {
                 str += productMaterial.Material.Title + ", ";
             }
-            return str;
+            return str?.Remove(str.Length-2,2);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

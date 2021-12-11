@@ -14,5 +14,6 @@ namespace ProductsIS
             if (_context == null) _context = new dataBaseEntities();
             return _context;
         }
+        public static void ApplyDataBaseChange() => _context?.ChangeTracker.Entries().ToList().ForEach(p => p.Reload());
     }
 }

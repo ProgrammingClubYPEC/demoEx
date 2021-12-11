@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ProductsIS"
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
-        Title="Сортировка" Height="150" Width="150" Closed="Window_Closed">
+        Title="Сортировка" Height="150" Width="150" Closed="Window_Closed" WindowStartupLocation="CenterOwner">
     <Grid>
         <StackPanel Orientation="Vertical">
             <TextBlock TextWrapping="Wrap">Выбирете режим сортировки:</TextBlock>

@@ -49,6 +49,49 @@ namespace ProductsIS
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
+    enum SortType
+    {
+        Name,
+        NumberWorkShop,
+        MinCost
+    }
+    class SortProductType : INotifyPropertyChanged
+    {
+        public string SortName { get; set; }
+        private SortType _sortType;
+        public SortType SortType
+        {
+            get =>_sortType;
+            set
+            {
+                switch(value)
+                {
+                    case SortType.MinCost:
+                        SortName = "Мин.стоимость";
+                        break;
+                    case SortType.Name:
+                        SortName = "Наименование";
+                        break;
+                    case SortType.NumberWorkShop:
+                        SortName = "Номер цеха";
+                        break;
+                }
+                _sortType = value;
+            }
+        }
+        private bool? _condition;
+        public bool? Сondition
+        {
+            get => _condition;
+            set
+            {
+                _condition = value;
+                OnPropertyChange("Сondition");
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChange(string property) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+    }
     class FilterProductType : INotifyPropertyChanged
     {
         private ProductType _productType;
@@ -96,17 +139,17 @@ namespace ProductsIS
         List<Page> pagesList = new List<Page>();
         public SortElement SortEl { get; set; }
         FilterProductType productTypeAll;
-        List<SortElement> sortElements;
+        List<SortProductType> sortElements;
         List<FilterProductType> filterProductType = new List<FilterProductType>();
         public MainWindow()
         {
             InitializeComponent();
             productTypeAll = new FilterProductType();
-            sortElements = new List<SortElement>()
+            sortElements = new List<SortProductType>()
             {
-                new SortElement(){Id = 1, Name = "Наименование"},
-                new SortElement(){Id = 2, Name = "Номер цеха"},
-                new SortElement(){Id = 3, Name = "Минимальная стоимость"}
+                new SortProductType(){SortType = SortType.MinCost},
+                new SortProductType(){SortType = SortType.Name},
+                new SortProductType(){SortType = SortType.NumberWorkShop}
             };
             sortComboBox.ItemsSource = sortElements;
             filterProductType.Add(productTypeAll);
@@ -123,25 +166,40 @@ namespace ProductsIS
             List<ProductType> filterList = filterProductType.GetRange(1,filterProductType.Count-1).Where(p => p.Check == true).Select(p => p.ProductType).ToList();
             if (filterList.Count > 0)
                 products = products.Where(p => filterList.Contains(p.ProductType)).ToList();
-            if (SortEl != null)
+            foreach(SortProductType sortProductType in sortElements)
             {
-                switch (SortEl.Id)
+                if(sortProductType.Сondition !=null)
                 {
-                    case 1:
-                        if (SortEl.Direction)
-                            products = products.OrderBy(p => p.Title).ToList();
-                        else products = products.OrderByDescending(p => p.Title).ToList();
-                            break;
-                    case 2:
-                        if (SortEl.Direction)
-                            products = products.OrderBy(p => p.ProductionWorkshopNumber).ToList();
-                        else products = products.OrderByDescending(p => p.ProductionWorkshopNumber).ToList();
-                        break;
-                    case 3:
-                        if (SortEl.Direction)
-                            products = products.OrderBy(p => p.MinCostForAgent).ToList();
-                        else products = products.OrderByDescending(p => p.MinCostForAgent).ToList();
-                        break;
+                    if(sortProductType.Сondition == false)
+                    {
+                        switch(sortProductType.SortType)
+                        {
+                            case SortType.Name:
+                                products = products.OrderBy(p => p.Title).ToList();
+                                break;
+                            case SortType.MinCost:
+                                products = products.OrderBy(p => p.MinCostForAgent).ToList();
+                                break;
+                            case SortType.NumberWorkShop:
+                                products = products.OrderBy(p => p.ProductionWorkshopNumber).ToList();
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (sortProductType.SortType)
+                        {
+                            case SortType.Name:
+                                products = products.OrderByDescending(p => p.Title).ToList();
+                                break;
+                            case SortType.MinCost:
+                                products = products.OrderByDescending(p => p.MinCostForAgent).ToList();
+                                break;
+                            case SortType.NumberWorkShop:
+                                products = products.OrderByDescending(p => p.ProductionWorkshopNumber).ToList();
+                                break;
+                        }
+                    }
                 }
             }
             countElements = products.Count;
@@ -194,19 +252,25 @@ namespace ProductsIS
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)=>UpdateList();
         private void filterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => ((ComboBox)sender).SelectedIndex = -1;
 
-        private void sortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox comboBox = sender as ComboBox;
-            SortWindow sortWindow = new SortWindow((SortElement)comboBox.SelectedItem);
-            sortWindow.Owner = this;
-            sortWindow.Show();
-        }
-
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Page page = (sender as RadioButton).DataContext as Page;
             currentPage = page.NumberPage;
             listBox.ItemsSource = page.RangeProducts;
         }
+
+        private void changeMinCostButton_Click(object sender, RoutedEventArgs e)
+        {
+            IList<Product> selectionProductList = listBox.SelectedItems.Cast<Product>().ToList();
+            DialogChangeMinCostWindow dialogChangeMinCostWindow = new DialogChangeMinCostWindow(selectionProductList);
+            if(dialogChangeMinCostWindow.ShowDialog()==true)
+            {
+                selectionProductList.ToList().ForEach(p => p.MinCostForAgent = dialogChangeMinCostWindow.Value);
+                ConnectDataBAse.GetContext().SaveChanges();
+                ConnectDataBAse.ApplyDataBaseChange();
+                listBox.SelectedItems.Clear();
+            }
+        }
+        private void listBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => changeMinCostButton.Visibility = (sender as ListBox)?.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden;
     }
 }

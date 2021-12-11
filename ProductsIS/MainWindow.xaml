@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProductsIS"
+        xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI"
+        xmlns:local="clr-namespace:ProductsIS" xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="450" MinWidth="800">
+        Title="MainWindow" MinHeight="450" MinWidth="800" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <local:ImageConvertet x:Key="imageConverter"></local:ImageConvertet>
+        <local:IlumConverter x:Key="ilConv"></local:IlumConverter>
         <local:ListToStrMaterial x:Key="materialConverter"></local:ListToStrMaterial>
         <local:SummCostMaterialConverter x:Key="summConverter"></local:SummCostMaterialConverter>
         <local:TypeMaterialConverter x:Key="typeMaterialConverter"></local:TypeMaterialConverter>
@@ -43,10 +45,10 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <ListBox x:Name="listBox" SelectionMode="Multiple" Margin="10,55">
+        <ListBox HorizontalContentAlignment="Stretch" x:Name="listBox" SelectionMode="Multiple" Margin="10,55" SelectionChanged="listBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Height="200">
+                    <StackPanel  Orientation="Horizontal" Height="200" Background="{Binding ProductSale, Converter={StaticResource ilConv}}">
                         <Image Margin="20" Source="{Binding Image, Converter={StaticResource imageConverter}}" Width="100"></Image>
                         <StackPanel Width="300" Orientation="Vertical">
                             <TextBlock FontSize="14" FontWeight="Bold" Margin="0,20,0,0"><Run Text="{Binding ProductType, Converter={StaticResource typeMaterialConverter}}"></Run> - <Run Text="{Binding Title}"></Run></TextBlock>
@@ -74,7 +76,7 @@
             </ItemsControl>
             <Button  FontSize="15" x:Name="nextBtn" Style="{StaticResource ButtonNavigationStyle}" Click="nextBtn_Click">&gt;</Button>
         </StackPanel>
-        <Grid Width="120" Height="22" Margin="10,26,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid Width="120" Height="22" Margin="0,26,161,0" HorizontalAlignment="Right" VerticalAlignment="Top">
             <ComboBox SelectionChanged="filterComboBox_SelectionChanged" Name="filterComboBox" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="120" DropDownClosed="filterComboBox_DropDownClosed" Grid.ColumnSpan="2">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -86,13 +88,61 @@
             </ComboBox>
             <TextBlock Text="Фильтры" IsHitTestVisible="False" TextAlignment="Center"></TextBlock>
         </Grid>
-        <TextBox x:Name="searchTextBox"  HorizontalAlignment="Left" Height="23" Margin="145,25,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="240" TextChanged="TextBox_TextChanged"/>
-        <ComboBox x:Name="sortComboBox" HorizontalAlignment="Left" Margin="405,26,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="sortComboBox_SelectionChanged">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"></TextBlock>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <TextBox x:Name="searchTextBox"  HorizontalAlignment="Right" Height="23" Margin="0,25,312,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="440" TextChanged="TextBox_TextChanged"/>
+        <Grid HorizontalAlignment="Right" Margin="0,26,11,0" VerticalAlignment="Top" Width="120">
+            <ComboBox DropDownClosed="filterComboBox_DropDownClosed" SelectionChanged="filterComboBox_SelectionChanged" x:Name="sortComboBox">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Margin="0,0,10,0" IsChecked="{Binding Сondition}" IsThreeState="True">
+                                <CheckBox.Style>
+                                    <Style TargetType="CheckBox">
+                                        <Style.Resources>
+                                            <SolidColorBrush x:Key="colorSort">Black</SolidColorBrush>
+                                        </Style.Resources>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="#FFFF0000"></Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="CheckBox">
+                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮇</TextBlock>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="CheckBox">
+                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮅</TextBlock>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="CheckBox">
+                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮁</TextBlock>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </CheckBox.Style>
+                            </CheckBox>
+                            <TextBlock Text="{Binding SortName}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Text="Сортировки" IsHitTestVisible="False" TextAlignment="Center"></TextBlock>
+        </Grid>
+        
+        <Button x:Name="changeMinCostButton" HorizontalAlignment="Left" Visibility="Hidden" VerticalAlignment="Bottom" Click="changeMinCostButton_Click" Margin="10,20">Изменить мин.стоимость</Button>
     </Grid>
 </Window>

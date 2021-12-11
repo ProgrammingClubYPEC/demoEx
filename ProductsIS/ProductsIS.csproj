@@ -46,6 +46,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -58,6 +59,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -75,6 +77,11 @@
     </Compile>
     <Compile Include="BoolToTextDecorConv.cs" />
     <Compile Include="ConnectDataBAse.cs" />
+    <Compile Include="DecimalValidator.cs" />
+    <Compile Include="DialogChangeMinCostWindow.xaml.cs">
+      <DependentUpon>DialogChangeMinCostWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IlumConverter.cs" />
     <Compile Include="ImageConvertet.cs" />
     <Compile Include="ListToStrMaterial.cs" />
     <Compile Include="Material.cs">
@@ -118,6 +125,10 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeMaterialConverter.cs" />
+    <Page Include="DialogChangeMinCostWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
