@@ -6,7 +6,7 @@
         xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI"
         xmlns:local="clr-namespace:ProductsIS" xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="450" MinWidth="800" WindowStartupLocation="CenterScreen">
+        Title="MainWindow" MinHeight="450" MinWidth="800" WindowStartupLocation="CenterScreen" Height="536" Width="795.5">
     <Window.Resources>
         <local:ImageConvertet x:Key="imageConverter"></local:ImageConvertet>
         <local:IlumConverter x:Key="ilConv"></local:IlumConverter>
@@ -14,6 +14,52 @@
         <local:SummCostMaterialConverter x:Key="summConverter"></local:SummCostMaterialConverter>
         <local:TypeMaterialConverter x:Key="typeMaterialConverter"></local:TypeMaterialConverter>
         <local:BoolToTextDecorConv x:Key="bttdConv"></local:BoolToTextDecorConv>
+        <Style x:Key="CheckBoxSortAsc" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontSize="8">A</TextBlock>
+                                <TextBlock FontSize="8">Z</TextBlock>
+                            </StackPanel>
+                            <TextBlock FontSize="16">↓</TextBlock>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="CheckBoxSortDesc" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontSize="8">Z</TextBlock>
+                                <TextBlock FontSize="8">A</TextBlock>
+                            </StackPanel>
+                            <TextBlock FontSize="16">↓</TextBlock>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="RadioButtonNavigationStyle" TargetType="{x:Type RadioButton}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -45,10 +91,10 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <ListBox HorizontalContentAlignment="Stretch" x:Name="listBox" SelectionMode="Multiple" Margin="10,55" SelectionChanged="listBox_SelectionChanged">
+        <ListBox HorizontalContentAlignment="Stretch" MouseDoubleClick="listBox_MouseDoubleClick" x:Name="listBox" SelectionMode="Multiple" Margin="10,55" SelectionChanged="listBox_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel  Orientation="Horizontal" Height="200" Background="{Binding ProductSale, Converter={StaticResource ilConv}}">
+                    <StackPanel MouseDown="StackPanel_MouseDown"  Orientation="Horizontal" Height="200" Background="{Binding ProductSale, Converter={StaticResource ilConv}}">
                         <Image Margin="20" Source="{Binding Image, Converter={StaticResource imageConverter}}" Width="100"></Image>
                         <StackPanel Width="300" Orientation="Vertical">
                             <TextBlock FontSize="14" FontWeight="Bold" Margin="0,20,0,0"><Run Text="{Binding ProductType, Converter={StaticResource typeMaterialConverter}}"></Run> - <Run Text="{Binding Title}"></Run></TextBlock>
@@ -94,48 +140,9 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Margin="0,0,10,0" IsChecked="{Binding Сondition}" IsThreeState="True">
-                                <CheckBox.Style>
-                                    <Style TargetType="CheckBox">
-                                        <Style.Resources>
-                                            <SolidColorBrush x:Key="colorSort">Black</SolidColorBrush>
-                                        </Style.Resources>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="BorderBrush" Value="#FFFF0000"></Setter>
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="CheckBox">
-                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮇</TextBlock>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="CheckBox">
-                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮅</TextBlock>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                            <Trigger Property="IsChecked" Value="{x:Null}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="CheckBox">
-                                                            <TextBlock Foreground="{TemplateBinding BorderBrush}" FontWeight="Bold" FontSize="15">⮁</TextBlock>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </CheckBox.Style>
-                            </CheckBox>
-                            <TextBlock Text="{Binding SortName}"></TextBlock>
+                            <TextBlock Text="{Binding SortName}" Margin="0,0,5,0"></TextBlock>
+                            <CheckBox Style="{StaticResource CheckBoxSortAsc}" Margin="0,0,5,0" IsChecked="{Binding IsAsc}"></CheckBox>
+                            <CheckBox Style="{StaticResource CheckBoxSortDesc}" IsChecked="{Binding IsDesc}"></CheckBox>
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -144,5 +151,6 @@
         </Grid>
         
         <Button x:Name="changeMinCostButton" HorizontalAlignment="Left" Visibility="Hidden" VerticalAlignment="Bottom" Click="changeMinCostButton_Click" Margin="10,20">Изменить мин.стоимость</Button>
+        <Button Content="Добавить товар" HorizontalAlignment="Left" Margin="343,465,0,0" VerticalAlignment="Top" Width="100" Click="Button_Click"/>
     </Grid>
 </Window>

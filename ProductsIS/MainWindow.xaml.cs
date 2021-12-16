@@ -79,15 +79,32 @@ namespace ProductsIS
                 _sortType = value;
             }
         }
-        private bool? _condition;
-        public bool? Сondition
+        private bool _isAsc;
+        private bool _isDesc;
+        public bool IsAsc
         {
-            get => _condition;
+            get => _isAsc;
             set
             {
-                _condition = value;
-                OnPropertyChange("Сondition");
+                if (value) _isDesc = false;
+                _isAsc = value;
+                OnAscDescChanged();
             }
+        }
+        public bool IsDesc
+        {
+            get => _isDesc;
+            set
+            {
+                if (value) _isAsc = false;
+                _isDesc = value;
+                OnAscDescChanged();
+            }
+        }
+        private void OnAscDescChanged()
+        {
+            OnPropertyChange("IsAsc");
+            OnPropertyChange("IsDesc");
         }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChange(string property) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
@@ -168,9 +185,7 @@ namespace ProductsIS
                 products = products.Where(p => filterList.Contains(p.ProductType)).ToList();
             foreach(SortProductType sortProductType in sortElements)
             {
-                if(sortProductType.Сondition !=null)
-                {
-                    if(sortProductType.Сondition == false)
+                    if(sortProductType.IsAsc)
                     {
                         switch(sortProductType.SortType)
                         {
@@ -185,7 +200,7 @@ namespace ProductsIS
                                 break;
                         }
                     }
-                    else
+                    else if(sortProductType.IsDesc)
                     {
                         switch (sortProductType.SortType)
                         {
@@ -200,7 +215,6 @@ namespace ProductsIS
                                 break;
                         }
                     }
-                }
             }
             countElements = products.Count;
             if (countElements > 20)
@@ -272,5 +286,27 @@ namespace ProductsIS
             }
         }
         private void listBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => changeMinCostButton.Visibility = (sender as ListBox)?.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Hidden;
+
+        private void listBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+        }
+
+        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.ClickCount ==2)
+            {
+                Product product = (sender as StackPanel).DataContext as Product;
+                EditProductWindow editProductWindow = new EditProductWindow(product);
+                editProductWindow.Owner = this;
+                editProductWindow.Show();
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            EditProductWindow editProductWindow = new EditProductWindow();
+            editProductWindow.Owner = this;
+            editProductWindow.Show();
+        }
     }
 }

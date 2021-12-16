@@ -13,6 +13,7 @@ namespace ProductsIS
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if(value == null) return "picture.png";
             try
             {
                 string path = Path.GetFullPath(((string)value).Replace(',', '.').Remove(0,1));

@@ -25,3 +25,5 @@ E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\SortWindow.g.cs
 E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\SortWindow.baml
 E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\DialogChangeMinCostWindow.g.cs
 E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\DialogChangeMinCostWindow.baml
+E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\EditProductWindow.g.cs
+E:\Visual Studio repos\ProductsIS\ProductsIS\obj\Debug\EditProductWindow.baml

@@ -81,6 +81,9 @@
     <Compile Include="DialogChangeMinCostWindow.xaml.cs">
       <DependentUpon>DialogChangeMinCostWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EditProductWindow.xaml.cs">
+      <DependentUpon>EditProductWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IlumConverter.cs" />
     <Compile Include="ImageConvertet.cs" />
     <Compile Include="ListToStrMaterial.cs" />
@@ -126,6 +129,10 @@
     </Compile>
     <Compile Include="TypeMaterialConverter.cs" />
     <Page Include="DialogChangeMinCostWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditProductWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
